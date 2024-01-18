@@ -1,46 +1,79 @@
-import {useEffect, useState} from 'react'
+import {Alert, Button, Form, Input, Spin} from "antd";
 import axios from "axios";
-import Single from "./Single";
-import { Col, Row } from 'antd';
-
-
+import {useState} from "react";
 function App() {
-    const [pokemons, setPokemons] = useState([]);
-    const [isLoading, setIsLoading] = useState(true);
 
-    useEffect( () => {
-        setTimeout( function(){
-            axios.get('https://pokeapi.co/api/v2/pokemon')
-                .then((res) => {
-                    setPokemons(res.data.results);
-                    setIsLoading(false);
-                })
-                .catch(err => {
-                    console.log(err);
-                })
-        }, 2000);
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
-    }, [] )
+    const onFinish = (data) => {
+        setIsSubmitting(true);
+        console.log(data);
+        // submit to api
+
+        axios.post(
+            'https://eo367xvj5dcmh00.m.pipedream.net',
+            data
+        )
+            .then((response) => {
+                console.warn(response)
+                setIsSubmitting(false);
+
+            })
+    }
 
     return (
         <>
-            <h1>List of Pokemons</h1>
-            {
-                isLoading ?
-                    <h2>Loading....</h2>
-                    :
-                    <Row>
+            <h1>Form</h1>
+            <Form
+                name="basic"
+                labelCol={{
+                    span: 8,
+                }}
+                wrapperCol={{
+                    span: 16,
+                }}
+                style={{
+                    maxWidth: 600,
+                }}
+                initialValues={{
+                    remember: true,
+                }}
+                onFinish={onFinish}
+                // onFinishFailed={onFinishFailed}
+                autoComplete="off"
+            >
+                <Form.Item
+                    label="First Name"
+                    name="first_name"
+                    rules={[
                         {
-                            pokemons.map( (pokemon, index) => {
-                                return (
-                                    <Col key={index} span={8}>
-                                        <Single data={pokemon} />
-                                    </Col>
-                                )
-                            })
-                        }
-                    </Row>
-            }
+                            required: true,
+                            message: 'Please input your First Name!',
+                        },
+                    ]}
+                >
+                    <Input />
+                </Form.Item>
+                <Form.Item
+                    label="Last Name"
+                    name="last_name"
+                >
+                    <Input />
+                </Form.Item>
+
+                <Form.Item
+                    wrapperCol={{
+                        offset: 8,
+                        span: 16,
+                    }}
+                >
+                    <Button type="primary" htmlType="submit">
+                        Submit
+                    </Button>
+                    <Spin spinning={isSubmitting}>
+                    </Spin>
+                </Form.Item>
+            </Form>
         </>
     );
 }
